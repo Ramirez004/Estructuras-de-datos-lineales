@@ -1,42 +1,29 @@
 def radix_sort_binario(lista):
+    # Paso 1: Determinar la longitud máxima de las claves
     if not lista:
         return lista
+    max_len = len(max(lista, key=len))
 
-    # Paso 1: Igualar longitudes solo para ordenar, pero conservar el original
-    max_len = max(len(b) for b in lista)
-    lista_con_pads = [(b.zfill(max_len), b) for b in lista]
+    # Igualar longitudes (rellenando con ceros a la izquierda)
+    lista = [b.zfill(max_len) for b in lista]
 
-    # Paso 2: Recorrer desde el bit menos significativo al más significativo
-    for i in range(max_len - 1, -1, -1):  # derecha a izquierda
-        cubeta_0 = []
-        cubeta_1 = []
+    # Pasos 2–6: Para cada dígito, de LSD a MSD:
+    #   2) Crear 2 cubetas (0 y 1)
+    #   3) Distribuir cada clave según el valor del bit actual
+    #   4) Recoger las cubetas en orden
+    for i in range(max_len - 1, -1, -1):
+        buckets = [[], []]                # dos cubetas: índices 0 y 1
+        for key in lista:
+            bit = int(key[i])             # extrae el bit (0 o 1)
+            buckets[bit].append(key)      
+        lista = [k for bucket in buckets for k in bucket]
 
-        for pad, original in lista_con_pads:
-            if pad[i] == '0':
-                cubeta_0.append((pad, original))
-            else:
-                cubeta_1.append((pad, original))
-
-        # Reunir en orden
-        lista_con_pads = cubeta_0 + cubeta_1
-
-    # Paso 3: Retornar solo los valores originales, ordenados correctamente
-    return [original for _, original in lista_con_pads]
+    # Paso 7: La lista ya está ordenada (con ceros de padding)
+    return lista
 
 
-# ===========================
 # Ejemplo de uso
-# ===========================
-def main():
-    datos_binarios = ['101', '011', '1001', '000', '1110', '01', '1', '111']
-
-    print("Datos binarios originales:")
-    print(datos_binarios)
-
-    ordenados = radix_sort_binario(datos_binarios)
-
-    print("\nDatos ordenados (Radix Sort Binario - LSD):")
-    print(ordenados)
-
 if __name__ == "__main__":
-    main()
+    datos = ['101', '011', '1001', '000', '1110', '01', '1', '111']
+    print("Original:", datos)
+    print("Ordenado:", radix_sort_binario(datos))
